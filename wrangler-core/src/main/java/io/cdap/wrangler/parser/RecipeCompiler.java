@@ -19,6 +19,8 @@ package io.cdap.wrangler.parser;
 import io.cdap.wrangler.api.CompileException;
 import io.cdap.wrangler.api.CompileStatus;
 import io.cdap.wrangler.api.Compiler;
+import io.cdap.wrangler.utils.ByteSize;
+import io.cdap.wrangler.utils.TimeDuration;
 import io.cdap.wrangler.api.RecipeSymbol;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -48,6 +50,16 @@ public final class RecipeCompiler implements Compiler {
       throw new CompileException(e.getMessage(), e);
     }
   }
+   @Override
+public Object visitValue(DirectivesParser.ValueContext ctx) {
+  if (ctx.BYTE_SIZE() != null) {
+    return new ByteSize(ctx.BYTE_SIZE().getText());
+  } else if (ctx.TIME_DURATION() != null) {
+    return new TimeDuration(ctx.TIME_DURATION().getText());
+  }
+  return super.visitValue(ctx); // or fallback logic (like INT, STRING, etc.)
+}
+
 
   @Override
   public CompileStatus compile(Path path) throws CompileException {
